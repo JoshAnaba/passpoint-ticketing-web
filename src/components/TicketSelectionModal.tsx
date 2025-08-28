@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 interface TicketSelectionModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onBuyTickets: (tickets: TicketType[]) => void;
 }
 
 interface TicketType {
@@ -19,7 +20,7 @@ interface TicketType {
   quantity: number;
 }
 
-const TicketSelectionModal = ({ isOpen, onClose }: TicketSelectionModalProps) => {
+const TicketSelectionModal = ({ isOpen, onClose, onBuyTickets }: TicketSelectionModalProps) => {
   const [tickets, setTickets] = useState<TicketType[]>([
     {
       id: "premium",
@@ -58,8 +59,15 @@ const TicketSelectionModal = ({ isOpen, onClose }: TicketSelectionModalProps) =>
   };
 
   const handleBuyTickets = () => {
-    // Simulate checkout process
-    alert("Proceeding to checkout...");
+    // Check if any tickets are selected
+    const hasSelectedTickets = tickets.some(ticket => ticket.quantity > 0);
+    if (!hasSelectedTickets) {
+      alert("Please select at least one ticket");
+      return;
+    }
+    
+    // Pass tickets to parent for cart/checkout flow
+    onBuyTickets(tickets);
     onClose();
   };
 
@@ -142,7 +150,7 @@ const TicketSelectionModal = ({ isOpen, onClose }: TicketSelectionModalProps) =>
             onClick={handleBuyTickets}
             className="w-full bg-primary text-primary-foreground hover:bg-primary/90 py-3 text-lg font-semibold"
           >
-            Buy Tickets
+            Add to Cart
           </Button>
         </div>
       </SheetContent>

@@ -3,16 +3,55 @@ import Header from "./Header";
 import EventDetails from "./EventDetails";
 import EventInfo from "./EventInfo";
 import TicketSelectionModal from "./TicketSelectionModal";
+import CartModal from "./CartModal";
+import CheckoutModal from "./CheckoutModal";
+
+interface TicketType {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  originalPrice?: number;
+  quantity: number;
+}
 
 const TicketingPage = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isTicketModalOpen, setIsTicketModalOpen] = useState(false);
+  const [isCartModalOpen, setIsCartModalOpen] = useState(false);
+  const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
+  const [cartTickets, setCartTickets] = useState<TicketType[]>([]);
 
   const handleSelectTickets = () => {
-    setIsModalOpen(true);
+    setIsTicketModalOpen(true);
   };
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
+  const handleCloseTicketModal = () => {
+    setIsTicketModalOpen(false);
+  };
+
+  const handleBuyTickets = (tickets: TicketType[]) => {
+    setCartTickets(tickets);
+    setIsTicketModalOpen(false);
+    setIsCartModalOpen(true);
+  };
+
+  const handleCloseCartModal = () => {
+    setIsCartModalOpen(false);
+  };
+
+  const handleRemoveTicket = (ticketId: string) => {
+    setCartTickets(prev => prev.map(ticket => 
+      ticket.id === ticketId ? { ...ticket, quantity: 0 } : ticket
+    ));
+  };
+
+  const handleProceedToCheckout = () => {
+    setIsCartModalOpen(false);
+    setIsCheckoutModalOpen(true);
+  };
+
+  const handleCloseCheckoutModal = () => {
+    setIsCheckoutModalOpen(false);
   };
 
   return (
@@ -34,8 +73,23 @@ const TicketingPage = () => {
       </main>
 
       <TicketSelectionModal 
-        isOpen={isModalOpen} 
-        onClose={handleCloseModal} 
+        isOpen={isTicketModalOpen} 
+        onClose={handleCloseTicketModal}
+        onBuyTickets={handleBuyTickets}
+      />
+
+      <CartModal
+        isOpen={isCartModalOpen}
+        onClose={handleCloseCartModal}
+        tickets={cartTickets}
+        onRemoveTicket={handleRemoveTicket}
+        onProceedToCheckout={handleProceedToCheckout}
+      />
+
+      <CheckoutModal
+        isOpen={isCheckoutModalOpen}
+        onClose={handleCloseCheckoutModal}
+        tickets={cartTickets}
       />
     </div>
   );
