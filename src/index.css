@@ -36,6 +36,15 @@ All colors MUST be HSL.
     --input: 214.3 31.8% 91.4%;
     --ring: 222.2 84% 4.9%;
 
+    /* Ticketing System Colors */
+    --gradient-primary: linear-gradient(90deg, hsl(270, 70%, 50%), hsl(190, 70%, 50%), hsl(30, 80%, 60%));
+    --gradient-subtle: linear-gradient(180deg, hsl(270, 70%, 98%), hsl(0, 0%, 100%));
+    --ticket-premium: 270 70% 50%;
+    --ticket-standard: 190 70% 50%;
+    --price-accent: 15 80% 55%;
+    --success: 142 76% 36%;
+    --success-foreground: 355.7 100% 97.3%;
+
     --radius: 0.5rem;
 
     --sidebar-background: 0 0% 98%;
