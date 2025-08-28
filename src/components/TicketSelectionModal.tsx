@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { X, Minus, Plus } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -64,14 +64,14 @@ const TicketSelectionModal = ({ isOpen, onClose }: TicketSelectionModalProps) =>
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md mx-auto max-h-[90vh] overflow-y-auto">
-        <DialogHeader className="flex flex-row items-center justify-between pb-4">
-          <DialogTitle className="text-xl font-bold">Select Your Tickets</DialogTitle>
+    <Sheet open={isOpen} onOpenChange={onClose}>
+      <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
+        <SheetHeader className="flex flex-row items-center justify-between pb-4">
+          <SheetTitle className="text-xl font-bold">Select Your Tickets</SheetTitle>
           <Button variant="ghost" size="sm" onClick={onClose}>
             <X className="w-5 h-5" />
           </Button>
-        </DialogHeader>
+        </SheetHeader>
 
         <div className="space-y-4">
           <p className="text-sm text-muted-foreground">
@@ -145,8 +145,8 @@ const TicketSelectionModal = ({ isOpen, onClose }: TicketSelectionModalProps) =>
             Buy Tickets
           </Button>
         </div>
-      </DialogContent>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
   );
 };
 
