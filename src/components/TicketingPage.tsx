@@ -5,6 +5,7 @@ import EventInfo from "./EventInfo";
 import TicketSelectionModal from "./TicketSelectionModal";
 import CartModal from "./CartModal";
 import CheckoutModal from "./CheckoutModal";
+import Footer from "./Footer";
 
 interface TicketType {
   id: string;
@@ -72,7 +73,9 @@ const TicketingPage = () => {
         </div>
       </main>
 
-      <TicketSelectionModal 
+      <Footer />
+
+      <TicketSelectionModal
         isOpen={isTicketModalOpen} 
         onClose={handleCloseTicketModal}
         onBuyTickets={handleBuyTickets}
