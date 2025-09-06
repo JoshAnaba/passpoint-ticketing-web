@@ -102,9 +102,6 @@ const CheckoutModal = ({ isOpen, onClose, tickets }: CheckoutModalProps) => {
             <SheetTitle className="text-xl font-bold text-foreground">Secure Checkout</SheetTitle>
             <p className="text-sm text-muted-foreground">Complete your ticket purchase</p>
           </div>
-          <Button variant="ghost" size="sm" onClick={onClose}>
-            <X className="w-5 h-5" />
-          </Button>
         </SheetHeader>
 
         <div className="space-y-6">

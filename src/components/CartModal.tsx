@@ -48,9 +48,6 @@ const CartModal = ({ isOpen, onClose, tickets, onRemoveTicket, onProceedToChecko
             <SheetTitle className="text-xl font-bold text-foreground">Cart Page</SheetTitle>
             <p className="text-sm text-muted-foreground">These are tickets in your cart</p>
           </div>
-          <Button variant="ghost" size="sm" onClick={onClose}>
-            <X className="w-5 h-5" />
-          </Button>
         </SheetHeader>
 
         <div className="space-y-4">

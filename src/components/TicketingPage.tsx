@@ -57,12 +57,15 @@ const TicketingPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-subtle">
-      <Header />
+      <Header 
+        cartTickets={cartTickets}
+        onOpenCart={() => setIsCartModalOpen(true)}
+      />
       
       <main className="max-w-7xl mx-auto px-4 py-8">
-        <div className="grid lg:grid-cols-3 gap-8">
+        <div className="grid lg:grid-cols-2 gap-8">
           {/* Left side - Event Details */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-1">
             <EventDetails />
           </div>
 
