@@ -6,6 +6,7 @@ import TicketSelectionModal from "./TicketSelectionModal";
 import CartModal from "./CartModal";
 import CheckoutModal from "./CheckoutModal";
 import Footer from "./Footer";
+import { useCurrency, useCart } from "@/context";
 
 interface TicketType {
   id: string;
@@ -20,7 +21,10 @@ const TicketingPage = () => {
   const [isTicketModalOpen, setIsTicketModalOpen] = useState(false);
   const [isCartModalOpen, setIsCartModalOpen] = useState(false);
   const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
-  const [cartTickets, setCartTickets] = useState<TicketType[]>([]);
+  
+  // Use context for currency and cart state
+  const { selectedCurrency, setCurrency } = useCurrency();
+  const { tickets: cartTickets } = useCart();
 
   const handleSelectTickets = () => {
     setIsTicketModalOpen(true);
@@ -31,19 +35,13 @@ const TicketingPage = () => {
   };
 
   const handleBuyTickets = (tickets: TicketType[]) => {
-    setCartTickets(tickets);
+    // Go directly to checkout, bypassing cart
     setIsTicketModalOpen(false);
-    setIsCartModalOpen(true);
+    setIsCheckoutModalOpen(true);
   };
 
   const handleCloseCartModal = () => {
     setIsCartModalOpen(false);
-  };
-
-  const handleRemoveTicket = (ticketId: string) => {
-    setCartTickets(prev => prev.map(ticket => 
-      ticket.id === ticketId ? { ...ticket, quantity: 0 } : ticket
-    ));
   };
 
   const handleProceedToCheckout = () => {
@@ -58,7 +56,6 @@ const TicketingPage = () => {
   return (
     <div className="min-h-screen bg-gradient-subtle">
       <Header 
-        cartTickets={cartTickets}
         onOpenCart={() => setIsCartModalOpen(true)}
       />
       
@@ -71,7 +68,9 @@ const TicketingPage = () => {
 
           {/* Right side - Event Info and Booking */}
           <div className="lg:col-span-1">
-            <EventInfo onSelectTickets={handleSelectTickets} />
+            <EventInfo 
+              onSelectTickets={handleSelectTickets}
+            />
           </div>
         </div>
       </main>
@@ -87,15 +86,12 @@ const TicketingPage = () => {
       <CartModal
         isOpen={isCartModalOpen}
         onClose={handleCloseCartModal}
-        tickets={cartTickets}
-        onRemoveTicket={handleRemoveTicket}
         onProceedToCheckout={handleProceedToCheckout}
       />
 
       <CheckoutModal
         isOpen={isCheckoutModalOpen}
         onClose={handleCloseCheckoutModal}
-        tickets={cartTickets}
       />
     </div>
   );

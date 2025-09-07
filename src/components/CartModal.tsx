@@ -1,27 +1,20 @@
-import { useState } from "react";
 import { X, Trash2 } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-
-interface TicketType {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  originalPrice?: number;
-  quantity: number;
-}
+import { formatCurrency } from "@/lib/currency";
+import { useCart, useCurrency } from "@/context";
+import PrimaryButton from "./PrimaryButton";
 
 interface CartModalProps {
   isOpen: boolean;
   onClose: () => void;
-  tickets: TicketType[];
-  onRemoveTicket: (ticketId: string) => void;
   onProceedToCheckout: () => void;
 }
 
-const CartModal = ({ isOpen, onClose, tickets, onRemoveTicket, onProceedToCheckout }: CartModalProps) => {
+const CartModal = ({ isOpen, onClose, onProceedToCheckout }: CartModalProps) => {
+  const { tickets, removeTicket } = useCart();
+  const { selectedCurrency } = useCurrency();
   const selectedTickets = tickets.filter(ticket => ticket.quantity > 0);
 
   const getTotalPrice = () => {
@@ -40,13 +33,19 @@ const CartModal = ({ isOpen, onClose, tickets, onRemoveTicket, onProceedToChecko
     onClose();
   };
 
+  const handleRemoveTicket = (ticketId: string) => {
+    removeTicket(ticketId);
+  };
+
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
       <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
         <SheetHeader className="flex flex-row items-center justify-between pb-4">
-          <div>
-            <SheetTitle className="text-xl font-bold text-foreground">Cart Page</SheetTitle>
-            <p className="text-sm text-muted-foreground">These are tickets in your cart</p>
+        <div>
+            <SheetTitle className="text-2xl font-medium">Cart Page</SheetTitle>
+            <p className="text-sm text-muted-foreground">
+            These are tickets in your cart
+            </p>
           </div>
         </SheetHeader>
 
@@ -79,11 +78,11 @@ const CartModal = ({ isOpen, onClose, tickets, onRemoveTicket, onProceedToChecko
                       </div>
                       <div className="mt-2">
                         <div className="text-lg font-bold text-foreground">
-                          ₦{(ticket.price * ticket.quantity).toLocaleString()}
+                          {formatCurrency(ticket.price * ticket.quantity, selectedCurrency)}
                         </div>
                         {ticket.originalPrice && (
                           <div className="text-sm text-price-accent line-through">
-                            ₦{(ticket.originalPrice * ticket.quantity).toLocaleString()}
+                            {formatCurrency(ticket.originalPrice * ticket.quantity, selectedCurrency)}
                           </div>
                         )}
                       </div>
@@ -92,7 +91,7 @@ const CartModal = ({ isOpen, onClose, tickets, onRemoveTicket, onProceedToChecko
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => onRemoveTicket(ticket.id)}
+                      onClick={() => handleRemoveTicket(ticket.id)}
                       className="text-destructive hover:text-destructive hover:bg-destructive/10 p-2"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -107,23 +106,22 @@ const CartModal = ({ isOpen, onClose, tickets, onRemoveTicket, onProceedToChecko
                   <span className="text-lg font-semibold text-foreground">Total</span>
                   <div className="text-right">
                     <div className="text-2xl font-bold text-foreground">
-                      ₦{getTotalPrice().toLocaleString()}
+                      {formatCurrency(getTotalPrice(), selectedCurrency)}
                     </div>
                     {getTotalOriginalPrice() > getTotalPrice() && (
                       <div className="text-sm text-price-accent line-through">
-                        ₦{getTotalOriginalPrice().toLocaleString()}
+                        {formatCurrency(getTotalOriginalPrice(), selectedCurrency)}
                       </div>
                     )}
                   </div>
                 </div>
               </div>
 
-              <Button 
+              <PrimaryButton 
                 onClick={handleProceedToCheckout}
-                className="w-full bg-primary text-primary-foreground hover:bg-primary/90 py-3 text-lg font-semibold"
               >
                 Proceed to Checkout
-              </Button>
+              </PrimaryButton>
             </>
           )}
         </div>

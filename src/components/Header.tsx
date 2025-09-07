@@ -2,22 +2,14 @@ import { HelpCircle, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import PasspointLogo from "./PasspointLogo";
 import headerGradient from "@/assets/header-gradient.jpg";
-
-interface TicketType {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  originalPrice?: number;
-  quantity: number;
-}
+import { useCart } from "@/context";
 
 interface HeaderProps {
-  cartTickets: TicketType[];
   onOpenCart: () => void;
 }
 
-const Header = ({ cartTickets, onOpenCart }: HeaderProps) => {
+const Header = ({ onOpenCart }: HeaderProps) => {
+  const { totalItems } = useCart();
   return (
     <header className="relative overflow-hidden">
       <div className="bg-white px-4 py-4 shadow-sm">
@@ -36,9 +28,9 @@ const Header = ({ cartTickets, onOpenCart }: HeaderProps) => {
             >
               <ShoppingCart className="w-4 h-4" />
               <span className="text-sm">Cart</span>
-              {cartTickets.filter(ticket => ticket.quantity > 0).length > 0 && (
+              {totalItems > 0 && (
                 <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                  {cartTickets.reduce((total, ticket) => total + ticket.quantity, 0)}
+                  {totalItems}
                 </span>
               )}
             </Button>

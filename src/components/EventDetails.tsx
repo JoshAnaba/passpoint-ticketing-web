@@ -24,17 +24,17 @@ const EventDetails = () => {
       </Card>
 
       <Dialog open={isImageModalOpen} onOpenChange={setIsImageModalOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] p-0">
+        <DialogContent className="max-w-4xl w-fit max-h-[90vh] p-0">
           <DialogHeader className="p-6 pb-0">
-            <div className="flex items-center justify-between">
-              <DialogTitle className="text-xl font-bold">Event Banner</DialogTitle>
-            </div>
+            {/* <div className="flex items-center justify-between">
+              <DialogTitle className="text-xl font-semibold">Event Banner</DialogTitle>
+            </div> */}
           </DialogHeader>
           <div className="p-6 pt-0">
             <img 
               src={abfBanner} 
               alt="Event Banner - Expanded View" 
-              className="w-full h-auto rounded-lg shadow-lg"
+              className="h-auto max-h-[80vh] rounded-lg"
             />
           </div>
         </DialogContent>
