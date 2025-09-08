@@ -11,7 +11,8 @@ import { formatCurrency } from "@/lib/currency";
 import { useCart, useCurrency, usePricing } from "@/context";
 import PrimaryButton from "./PrimaryButton";
 import type { TicketType } from "@/context";
-import { initiatePayment } from "@/services/api";
+import { initiatePayment, getMerchantId } from "@/services/api";
+import { getMerchantApiKey, generateToken } from "@/services/api";
 
 interface ContactInfo {
   fullName: string;
@@ -99,15 +100,43 @@ const CheckoutModal = ({ isOpen, onClose }: CheckoutModalProps) => {
       countryCode: selectedCountry,
       amount,
       narration: "Ticket purchase",
-      successUrl: `${window.location.origin}/?status=success`,
-      failureUrl: `${window.location.origin}/?status=failure`,
+      // successUrl: `${window.location.origin}/?status=success`,
+      successUrl: `https://mypasspoint.com/?status=success`,
+      // failureUrl: `${window.location.origin}/?status=failure`,
+      failureUrl: `https://mypasspoint.com/?status=failure`,
       email: contactInfo.email,
       fullName: contactInfo.fullName,
     };
 
     try {
       setSubmitting(true);
-      const data = await initiatePayment(payload);
+      // 1) Read merchantId (should have been stored during pricing fetch)
+      const merchantId = await getMerchantId();
+      if (!merchantId) {
+        throw new Error("Unable to resolve merchant ID for selected country");
+      }
+
+      // 2) Obtain merchant apiKey (cached or fetch)
+      let apiKey = localStorage.getItem('merchantApiKey') || undefined;
+      if (!apiKey) {
+        const credsKey = await getMerchantApiKey(merchantId);
+        apiKey = (credsKey as any)?.data?.apiKey as string | undefined;
+        if (apiKey) localStorage.setItem('merchantApiKey', apiKey);
+      }
+      if (!apiKey) {
+        throw new Error("Failed to obtain merchant API key");
+      }
+
+      // 3) Exchange apiKey for Bearer access token
+      const tokenResp = await generateToken(merchantId, apiKey);
+      const accessToken = (tokenResp as any)?.data?.accessToken as string | undefined;
+      const tokenType = ((tokenResp as any)?.data?.tokenType || 'Bearer') as string;
+      if (!accessToken) {
+        throw new Error("Failed to obtain access token");
+      }
+
+      // 4) Initiate payment with Authorization and x-merchant-id headers
+      const data = await initiatePayment(payload, { accessToken, merchantId, tokenType });
 
       // Try to find a redirect URL field commonly returned by gateways
       const redirectUrl = data?.redirectUrl || data?.paymentUrl || data?.data?.redirectUrl || data?.data?.paymentUrl;
@@ -351,3 +380,4 @@ const CheckoutModal = ({ isOpen, onClose }: CheckoutModalProps) => {
 };
 
 export default CheckoutModal;
+

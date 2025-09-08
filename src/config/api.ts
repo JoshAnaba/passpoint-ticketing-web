@@ -5,20 +5,15 @@ export const API_CONFIG = {
   ENDPOINTS: {
     CURRENCIES: '/checkout/app/country-list',
     PRICES: (countryCode: string) => `/checkout/app/get-price-option/${countryCode}/abf`,
+    GET_MERCHANT_API_KEY: (merchantId: string) => `/userapp/merchant-app/get-credential`,
   },
   
   // Default fallback data
   FALLBACK_CURRENCIES: [
     { name: "Nigeria", value: "NG", currency: "NGN" },
-    { name: "United States", value: "US", currency: "USD" },
-    { name: "United Kingdom", value: "GB", currency: "GBP" },
-    { name: "European Union", value: "EU", currency: "EUR" },
   ],
   
   FALLBACK_PRICES: {
-    NGN: { currency: "NGN", premium: 431000, standard: 215000 },
-    USD: { currency: "USD", premium: 500, standard: 250 },
-    GBP: { currency: "GBP", premium: 400, standard: 200 },
-    EUR: { currency: "EUR", premium: 450, standard: 225 },
+    NGN: { currency: "NGN", premium: 0, standard: 0 },
   },
 };
