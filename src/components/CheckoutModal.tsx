@@ -8,8 +8,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useToast } from "@/hooks/use-toast";
 import { formatCurrency } from "@/lib/currency";
-import { useCart, useCurrency } from "@/context";
+import { useCart, useCurrency, usePricing } from "@/context";
 import PrimaryButton from "./PrimaryButton";
+import type { TicketType } from "@/context";
+import { initiatePayment } from "@/services/api";
 
 interface ContactInfo {
   fullName: string;
@@ -25,6 +27,7 @@ interface CheckoutModalProps {
 const CheckoutModal = ({ isOpen, onClose }: CheckoutModalProps) => {
   const { tickets } = useCart();
   const { selectedCurrency } = useCurrency();
+  const { selectedCountry } = usePricing();
   const { toast } = useToast();
   const [contactInfo, setContactInfo] = useState<ContactInfo>({
     fullName: "",
@@ -69,48 +72,64 @@ const CheckoutModal = ({ isOpen, onClose }: CheckoutModalProps) => {
     });
   };
 
-  const handleContinueToPayment = () => {
-    // Basic validation for main contact info
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleContinueToPayment = async () => {
+    // Basic validation for main contact info only
     if (!contactInfo.fullName || !contactInfo.email) {
       toast({
         title: "Missing Information",
-        description: "Please fill in your contact information.",
+        description: "Please fill in your contact information (name and email).",
         variant: "destructive",
       });
       return;
     }
 
-    // Validate ticket contact information
-    for (const ticket of selectedTickets) {
-      const ticketContacts = ticketContactInfo[ticket.id] || [];
-
-      for (let i = 0; i < ticketContacts.length; i++) {
-        const contact = ticketContacts[i];
-        if (!contact?.fullName || !contact?.email) {
-          toast({
-            title: "Missing Ticket Information",
-            description: `Please fill in contact information for ${ticket.name} ticket ${i + 1}.`,
-            variant: "destructive",
-          });
-          return;
-        }
-      }
+    const amount = getTotalPrice();
+    if (amount <= 0) {
+      toast({
+        title: "No tickets selected",
+        description: "Please add at least one ticket before continuing.",
+        variant: "destructive",
+      });
+      return;
     }
 
-    // Simulate payment processing
-    toast({
-      title: "Processing Payment",
-      description: "Redirecting to payment gateway...",
-    });
+    const payload = {
+      countryCode: selectedCountry,
+      amount,
+      narration: "Ticket purchase",
+      successUrl: `${window.location.origin}/?status=success`,
+      failureUrl: `${window.location.origin}/?status=failure`,
+      email: contactInfo.email,
+      fullName: contactInfo.fullName,
+    };
 
-    // In a real app, this would redirect to payment processor
-    setTimeout(() => {
+    try {
+      setSubmitting(true);
+      const data = await initiatePayment(payload);
+
+      // Try to find a redirect URL field commonly returned by gateways
+      const redirectUrl = data?.redirectUrl || data?.paymentUrl || data?.data?.redirectUrl || data?.data?.paymentUrl;
+      if (redirectUrl) {
+        toast({ title: "Redirecting to payment..." });
+        window.location.href = redirectUrl as string;
+        return;
+      }
+
       toast({
-        title: "Payment Successful!",
-        description: "Your tickets have been purchased successfully.",
+        title: "Payment initiated",
+        description: "No redirect URL returned. Please check the response in console.",
       });
-      onClose();
-    }, 2000);
+      // Fallback: log full response for debugging
+      // eslint-disable-next-line no-console
+      console.log("initiate-payment response", data);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Failed to initiate payment";
+      toast({ title: "Payment error", description: message, variant: "destructive" });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   // Initialize ticket contact info when component mounts or tickets/sendToMultiple change
@@ -321,6 +340,7 @@ const CheckoutModal = ({ isOpen, onClose }: CheckoutModalProps) => {
 
           <PrimaryButton
             onClick={handleContinueToPayment}
+            disabled={submitting}
           >
             Continue to Payment
           </PrimaryButton>

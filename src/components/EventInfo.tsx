@@ -73,7 +73,7 @@ const EventInfo = ({ onSelectTickets }: EventInfoProps) => {
         </div>
       </div>
 
-      <div className="flex lg:flex-row flex-col justify-between">
+      <div className="flex lg:flex-row flex-col gap-2 justify-between">
         <div className="lg:min-w-[240px]">
           <label className="text-sm font-medium text-foreground mb-2 block">
             Select Currency
@@ -93,7 +93,7 @@ const EventInfo = ({ onSelectTickets }: EventInfoProps) => {
                         currency={currencyOption.currency} 
                         className="w-4 h-3 object-cover rounded-sm"
                       />
-                      <span>{currencyOption.name} ({getCurrencySymbol(currencyOption.currency)})</span>
+                      <span>{currencyOption.name} - {currencyOption.currency} ({getCurrencySymbol(currencyOption.currency)})</span>
                     </div>
                   </SelectItem>
                 ))
@@ -112,11 +112,11 @@ const EventInfo = ({ onSelectTickets }: EventInfoProps) => {
               "Loading..."
             )}
           </div>
-          {selectedCurrency === "NGN" && prices && (
+          {/* {selectedCurrency === "NGN" && prices && (
             <div className="text-price-accent font-medium line-through">
               {formatCurrency(prices.premium, selectedCurrency)}
             </div>
-          )}
+          )} */}
         </div>
 
 

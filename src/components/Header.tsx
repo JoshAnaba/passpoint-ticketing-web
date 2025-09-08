@@ -20,7 +20,7 @@ const Header = ({ onOpenCart }: HeaderProps) => {
 
           </div>
           <div className="flex items-center gap-4">
-            <Button
+            {/* <Button
               variant="ghost"
               size="sm"
               onClick={onOpenCart}
@@ -33,7 +33,7 @@ const Header = ({ onOpenCart }: HeaderProps) => {
                   {totalItems}
                 </span>
               )}
-            </Button>
+            </Button> */}
             <div className="flex items-center gap-2 text-muted-foreground">
               <HelpCircle className="w-4 h-4" />
               <span className="text-sm">Need help? support@passpoint.com</span>

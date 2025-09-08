@@ -1,82 +1,17 @@
-import React, { createContext, useContext, useReducer, useEffect, ReactNode } from 'react';
-import { getAvailableCurrencies, getPricesForCountry, CurrencyOption, PriceData } from '@/services/api';
+import React, { createContext, useContext, ReactNode } from 'react';
+import { usePricingData } from '@/hooks/usePricingQueries';
+import { CurrencyOption, PriceData } from '@/services/api';
 
 // Types
-interface PricingState {
-  currencies: CurrencyOption[];
+interface PricingContextType {
   selectedCurrency: string;
   selectedCountry: string;
+  setCurrency: (currency: string) => void;
+  currencies: CurrencyOption[];
   prices: PriceData | null;
   loading: boolean;
   error: string | null;
-  lastUpdated: number | null;
-}
-
-interface PricingContextType extends PricingState {
-  setCurrency: (currency: string) => void;
-  refreshPrices: () => Promise<void>;
-  clearError: () => void;
-}
-
-// Action types
-type PricingAction =
-  | { type: 'SET_LOADING'; payload: boolean }
-  | { type: 'SET_ERROR'; payload: string | null }
-  | { type: 'SET_CURRENCIES'; payload: CurrencyOption[] }
-  | { type: 'SET_CURRENCY'; payload: { currency: string; country: string } }
-  | { type: 'SET_PRICES'; payload: PriceData }
-  | { type: 'CLEAR_ERROR' }
-  | { type: 'SET_LAST_UPDATED'; payload: number };
-
-// Initial state
-const initialState: PricingState = {
-  currencies: [],
-  selectedCurrency: 'USD',
-  selectedCountry: 'US',
-  prices: null,
-  loading: true,
-  error: null,
-  lastUpdated: null,
-};
-
-// Reducer
-function pricingReducer(state: PricingState, action: PricingAction): PricingState {
-  switch (action.type) {
-    case 'SET_LOADING':
-      return { ...state, loading: action.payload };
-    
-    case 'SET_ERROR':
-      return { ...state, error: action.payload, loading: false };
-    
-    case 'SET_CURRENCIES':
-      return { ...state, currencies: action.payload };
-    
-    case 'SET_CURRENCY':
-      return { 
-        ...state, 
-        selectedCurrency: action.payload.currency,
-        selectedCountry: action.payload.country,
-        error: null
-      };
-    
-    case 'SET_PRICES':
-      return { 
-        ...state, 
-        prices: action.payload, 
-        loading: false, 
-        error: null,
-        lastUpdated: Date.now()
-      };
-    
-    case 'CLEAR_ERROR':
-      return { ...state, error: null };
-    
-    case 'SET_LAST_UPDATED':
-      return { ...state, lastUpdated: action.payload };
-    
-    default:
-      return state;
-  }
+  refetchPrices: () => void;
 }
 
 // Create context
@@ -88,103 +23,47 @@ interface PricingProviderProps {
 }
 
 export const PricingProvider: React.FC<PricingProviderProps> = ({ children }) => {
-  const [state, dispatch] = useReducer(pricingReducer, initialState);
+  const [selectedCurrency, setSelectedCurrency] = React.useState('USD');
+  const [selectedCountry, setSelectedCountry] = React.useState('US');
 
-  // Load currencies on mount
-  useEffect(() => {
-    const loadCurrencies = async () => {
-      try {
-        dispatch({ type: 'SET_LOADING', payload: true });
-        dispatch({ type: 'SET_ERROR', payload: null });
-        
-        const currencies = await getAvailableCurrencies();
-        dispatch({ type: 'SET_CURRENCIES', payload: currencies });
-        
-        // Set default currency to first available or USD
-        const defaultCurrency = currencies.find(c => c.currency === 'USD') || currencies[0];
-        if (defaultCurrency) {
-          dispatch({ 
-            type: 'SET_CURRENCY', 
-            payload: { 
-              currency: defaultCurrency.currency, 
-              country: defaultCurrency.value 
-            } 
-          });
-        }
-      } catch (error) {
-        dispatch({ type: 'SET_ERROR', payload: 'Failed to load currencies' });
+  // Use the custom hook for pricing data with React Query
+  const {
+    currencies = [] as CurrencyOption[],
+    prices = null as PriceData | null,
+    loading,
+    error,
+    refetchPrices,
+  } = usePricingData(selectedCountry);
+
+  // Set default currency when currencies are loaded
+  React.useEffect(() => {
+    if (currencies.length > 0 && selectedCurrency === 'USD') {
+      const defaultCurrency = currencies.find(c => c.currency === 'USD') || currencies[0];
+      if (defaultCurrency) {
+        setSelectedCurrency(defaultCurrency.currency);
+        setSelectedCountry(defaultCurrency.value);
       }
-    };
-
-    loadCurrencies();
-  }, []);
-
-  // Load prices when currency changes
-  useEffect(() => {
-    const loadPrices = async () => {
-      if (!state.selectedCountry) return;
-      
-      try {
-        dispatch({ type: 'SET_LOADING', payload: true });
-        dispatch({ type: 'SET_ERROR', payload: null });
-        
-        const prices = await getPricesForCountry(state.selectedCountry);
-        
-        if (prices) {
-          dispatch({ type: 'SET_PRICES', payload: prices });
-        } else {
-          dispatch({ type: 'SET_ERROR', payload: 'No pricing data available' });
-        }
-      } catch (error) {
-        dispatch({ type: 'SET_ERROR', payload: 'Failed to load prices' });
-      }
-    };
-
-    loadPrices();
-  }, [state.selectedCountry]);
+    }
+  }, [currencies, selectedCurrency]);
 
   // Context methods
   const setCurrency = (currency: string) => {
-    const currencyOption = state.currencies.find(c => c.currency === currency);
+    const currencyOption = currencies.find(c => c.currency === currency);
     if (currencyOption) {
-      dispatch({ 
-        type: 'SET_CURRENCY', 
-        payload: { 
-          currency: currencyOption.currency, 
-          country: currencyOption.value 
-        } 
-      });
+      setSelectedCurrency(currencyOption.currency);
+      setSelectedCountry(currencyOption.value);
     }
-  };
-
-  const refreshPrices = async () => {
-    if (!state.selectedCountry) return;
-    
-    try {
-      dispatch({ type: 'SET_LOADING', payload: true });
-      dispatch({ type: 'SET_ERROR', payload: null });
-      
-      const prices = await getPricesForCountry(state.selectedCountry);
-      
-      if (prices) {
-        dispatch({ type: 'SET_PRICES', payload: prices });
-      } else {
-        dispatch({ type: 'SET_ERROR', payload: 'No pricing data available' });
-      }
-    } catch (error) {
-      dispatch({ type: 'SET_ERROR', payload: 'Failed to refresh prices' });
-    }
-  };
-
-  const clearError = () => {
-    dispatch({ type: 'CLEAR_ERROR' });
   };
 
   const contextValue: PricingContextType = {
-    ...state,
+    selectedCurrency,
+    selectedCountry,
     setCurrency,
-    refreshPrices,
-    clearError,
+    currencies,
+    prices,
+    loading,
+    error: error?.message || null,
+    refetchPrices,
   };
 
   return (
@@ -210,8 +89,8 @@ export const useCurrency = () => {
 };
 
 export const usePrices = () => {
-  const { prices, loading, error, refreshPrices } = usePricing();
-  return { prices, loading, error, refreshPrices };
+  const { prices, loading, error, refetchPrices } = usePricing();
+  return { prices, loading, error, refreshPrices: refetchPrices };
 };
 
 export const useTicketPrice = (ticketType: 'premium' | 'standard') => {

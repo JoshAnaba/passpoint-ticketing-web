@@ -46,6 +46,30 @@ async function apiRequest<T>(endpoint: string): Promise<T> {
   }
 }
 
+// Generic API POST function
+async function apiPost<T>(endpoint: string, body: unknown): Promise<T> {
+  const url = `${API_CONFIG.BASE_URL}${endpoint}`;
+
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    });
+
+    if (!response.ok) {
+      throw new Error(`API request failed: ${response.status} ${response.statusText}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('API POST error:', error);
+    throw error;
+  }
+}
+
 // Get available currencies
 export const getAvailableCurrencies = async (): Promise<CurrencyOption[]> => {
   try {
@@ -125,4 +149,33 @@ export const formatPriceDataForComponent = (priceData: PriceData, ticketType: 'p
     originalAmount: undefined, // No original price from API
     originalCurrency: undefined
   };
+};
+
+// -------------------- Checkout: initiate payment --------------------
+
+export interface InitiatePaymentRequest {
+  countryCode: string;
+  amount: number;
+  narration: string;
+  successUrl: string;
+  failureUrl: string;
+  email: string;
+  fullName: string;
+}
+
+export interface InitiatePaymentResponse {
+  responseCode?: string;
+  responseMessage?: string;
+  responseDescription?: string;
+  data?: unknown;
+  redirectUrl?: string;
+  paymentUrl?: string;
+}
+
+const INITIATE_PAYMENT_ENDPOINT = '/checkout/api/initiate-payment';
+
+export const initiatePayment = async (
+  payload: InitiatePaymentRequest
+): Promise<InitiatePaymentResponse> => {
+  return apiPost<InitiatePaymentResponse>(INITIATE_PAYMENT_ENDPOINT, payload);
 };
