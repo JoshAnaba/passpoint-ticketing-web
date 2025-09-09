@@ -100,10 +100,10 @@ const CheckoutModal = ({ isOpen, onClose }: CheckoutModalProps) => {
       countryCode: selectedCountry,
       amount,
       narration: "Ticket purchase",
-      // successUrl: `${window.location.origin}/?status=success`,
-      successUrl: `https://mypasspoint.com/?status=success`,
-      // failureUrl: `${window.location.origin}/?status=failure`,
-      failureUrl: `https://mypasspoint.com/?status=failure`,
+      successUrl: `${window.location.origin}/?status=success`,
+      // successUrl: `https://mypasspoint.com/?status=success`,
+      failureUrl: `${window.location.origin}/?status=failure`,
+      // failureUrl: `https://mypasspoint.com/?status=failure`,
       email: contactInfo.email,
       fullName: contactInfo.fullName,
     };
@@ -370,6 +370,7 @@ const CheckoutModal = ({ isOpen, onClose }: CheckoutModalProps) => {
           <PrimaryButton
             onClick={handleContinueToPayment}
             disabled={submitting}
+            loading={submitting}
           >
             Continue to Payment
           </PrimaryButton>
