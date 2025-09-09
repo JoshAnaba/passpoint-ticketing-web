@@ -75,7 +75,7 @@ async function apiPost<T>(endpoint: string, body: unknown): Promise<T> {
 // Build request config similar to the Next.js example (Vite uses import.meta.env)
 export const getRequestConfig = () => {
   const channelId = import.meta.env.VITE_PAYMENT_CHANNEL_ID as string | undefined;
-  const channelCode = import.meta.env.VITE_CARD_CHANNEL_CODE as string | undefined;
+  const channelCode = import.meta.env.VITE_PAYMENT_CHANNEL_CODE as string | undefined;
   // const merchant = getMerchantId();
   const merchant = getMerchantId();
   console.log('merchant', merchant);
@@ -217,11 +217,13 @@ export const initiatePayment = async (
   payload: InitiatePaymentRequest,
   auth?: { accessToken: string; merchantId: string; tokenType?: string }
 ): Promise<InitiatePaymentResponse> => {
+  const channelCode = import.meta.env.VITE_PAYMENT_CHANNEL_CODE as string | undefined;
   const url = `${API_CONFIG.BASE_URL}${INITIATE_PAYMENT_ENDPOINT}`;
   const cfg = getRequestConfig();
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     ...cfg.headers,
+    'x-channel-code': channelCode
   };
   if (auth?.accessToken) headers['Authorization'] = `Bearer ${auth.accessToken}`;
   if (auth?.merchantId) headers['x-merchant-id'] = auth.merchantId;

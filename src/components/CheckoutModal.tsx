@@ -139,7 +139,7 @@ const CheckoutModal = ({ isOpen, onClose }: CheckoutModalProps) => {
       const data = await initiatePayment(payload, { accessToken, merchantId, tokenType });
 
       // Try to find a redirect URL field commonly returned by gateways
-      const redirectUrl = data?.redirectUrl || data?.paymentUrl || data?.data?.redirectUrl || data?.data?.paymentUrl;
+      const redirectUrl = data?.data?.url || data?.redirectUrl || data?.paymentUrl || data?.data?.redirectUrl || data?.data?.paymentUrl;
       if (redirectUrl) {
         toast({ title: "Redirecting to payment..." });
         window.location.href = redirectUrl as string;
