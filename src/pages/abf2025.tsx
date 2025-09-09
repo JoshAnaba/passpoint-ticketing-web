@@ -1,7 +1,7 @@
 import TicketingPage from "@/components/TicketingPage";
 
-const Index = () => {
+const ABF2025 = () => {
   return <TicketingPage />;
 };
 
-export default Index;
+export default ABF2025;
