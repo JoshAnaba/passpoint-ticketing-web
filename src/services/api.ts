@@ -119,7 +119,7 @@ export const getPricesForCountry = async (countryCode: string): Promise<PriceDat
     const response = await apiRequest<PriceResponse>(API_CONFIG.ENDPOINTS.PRICES(countryCode));
     
     if (response.responseCode === '00' && response.data[countryCode]) {
-      localStorage.setItem('merchantId', response.otherInfo);
+      sessionStorage.setItem('merchantId', response.otherInfo);
       getMerchantApiKey(response.otherInfo);
       // initMerchantCredentials(response.otherInfo);
       return response.data[countryCode];
@@ -133,7 +133,7 @@ export const getPricesForCountry = async (countryCode: string): Promise<PriceDat
 };
 
 export const getMerchantId = (): string | null => {
-  return localStorage.getItem('merchantId') || null;
+  return sessionStorage.getItem('merchantId') || null;
   // return 'fbf215c2-d6cd-4d88-be4e-e9b6d55dc78d'
 }
 
@@ -282,7 +282,7 @@ export const initMerchantCredentials = async (
     const json = await res.json();
     try {
       const apiKey = (json as any)?.data?.apiKey as string | undefined;
-      if (apiKey) localStorage.setItem('merchantApiKey', apiKey);
+      if (apiKey) sessionStorage.setItem('merchantApiKey', apiKey);
     } catch (_) {
       // ignore storage errors (e.g., SSR)
     }
@@ -314,7 +314,7 @@ export const getMerchantApiKey = async (
     const json = await res.json();
     try {
       const apiKey = (json as any)?.data?.apiKey as string | undefined;
-      if (apiKey) localStorage.setItem('merchantApiKey', apiKey);
+      if (apiKey) sessionStorage.setItem('merchantApiKey', apiKey);
     } catch (_) {
       // ignore storage errors (e.g., SSR)
     }

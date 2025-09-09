@@ -117,11 +117,11 @@ const CheckoutModal = ({ isOpen, onClose }: CheckoutModalProps) => {
       }
 
       // 2) Obtain merchant apiKey (cached or fetch)
-      let apiKey = localStorage.getItem('merchantApiKey') || undefined;
+      let apiKey = sessionStorage.getItem('merchantApiKey') || undefined;
       if (!apiKey) {
         const credsKey = await getMerchantApiKey(merchantId);
         apiKey = (credsKey as any)?.data?.apiKey as string | undefined;
-        if (apiKey) localStorage.setItem('merchantApiKey', apiKey);
+        if (apiKey) sessionStorage.setItem('merchantApiKey', apiKey);
       }
       if (!apiKey) {
         throw new Error("Failed to obtain merchant API key");
