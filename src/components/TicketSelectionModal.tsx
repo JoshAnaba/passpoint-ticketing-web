@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { formatCurrency } from "@/lib/currency";
-import { useCurrency, usePrices, useCart } from "@/context";
+import { useCurrency, usePrices, useCart, TicketType } from "@/context";
 import PrimaryButton from "./PrimaryButton";
 
 const SheetHeaderComp = ({title, subtitle}) => {
@@ -23,7 +23,7 @@ const SheetHeaderComp = ({title, subtitle}) => {
 interface TicketSelectionModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onBuyTickets: (tickets: any[]) => void;
+  onBuyTickets: (tickets: TicketType[]) => void;
 }
 
 // Internal component for displaying ticket prices

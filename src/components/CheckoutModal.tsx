@@ -11,8 +11,7 @@ import { formatCurrency } from "@/lib/currency";
 import { useCart, useCurrency, usePricing } from "@/context";
 import PrimaryButton from "./PrimaryButton";
 import type { TicketType } from "@/context";
-import { initiatePayment, getMerchantId } from "@/services/api";
-import { getMerchantApiKey, generateToken } from "@/services/api";
+import { initiatePayment, getMerchantId, getMerchantApiKey, generateToken, InitCredentialsResponse, GenerateTokenResponse } from "@/services/api";
 
 interface ContactInfo {
   fullName: string;
@@ -120,7 +119,7 @@ const CheckoutModal = ({ isOpen, onClose }: CheckoutModalProps) => {
       let apiKey = sessionStorage.getItem('merchantApiKey') || undefined;
       if (!apiKey) {
         const credsKey = await getMerchantApiKey(merchantId);
-        apiKey = (credsKey as any)?.data?.apiKey as string | undefined;
+        apiKey = (credsKey as InitCredentialsResponse)?.data?.apiKey as string | undefined;
         if (apiKey) sessionStorage.setItem('merchantApiKey', apiKey);
       }
       if (!apiKey) {
@@ -129,8 +128,8 @@ const CheckoutModal = ({ isOpen, onClose }: CheckoutModalProps) => {
 
       // 3) Exchange apiKey for Bearer access token
       const tokenResp = await generateToken(merchantId, apiKey);
-      const accessToken = (tokenResp as any)?.data?.accessToken as string | undefined;
-      const tokenType = ((tokenResp as any)?.data?.tokenType || 'Bearer') as string;
+      const accessToken = (tokenResp as GenerateTokenResponse)?.data?.accessToken as string | undefined;
+      const tokenType = ((tokenResp as GenerateTokenResponse)?.data?.tokenType || 'Bearer') as string;
       if (!accessToken) {
         throw new Error("Failed to obtain access token");
       }
@@ -139,7 +138,7 @@ const CheckoutModal = ({ isOpen, onClose }: CheckoutModalProps) => {
       const data = await initiatePayment(payload, { accessToken, merchantId, tokenType });
 
       // Try to find a redirect URL field commonly returned by gateways
-      const redirectUrl = data?.data?.url || data?.redirectUrl || data?.paymentUrl || data?.data?.redirectUrl || data?.data?.paymentUrl;
+      const redirectUrl = (data as any)?.data?.url || (data as any)?.redirectUrl || (data as any)?.paymentUrl || (data as any)?.data?.redirectUrl || (data as any)?.data?.paymentUrl;
       if (redirectUrl) {
         toast({ title: "Redirecting to payment..." });
         window.location.href = redirectUrl as string;

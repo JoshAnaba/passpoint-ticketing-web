@@ -281,7 +281,7 @@ export const initMerchantCredentials = async (
     if (!res.ok) throw new Error(`Init credentials failed: ${res.status} ${res.statusText}`);
     const json = await res.json();
     try {
-      const apiKey = (json as any)?.data?.apiKey as string | undefined;
+      const apiKey = (json as InitCredentialsResponse)?.data?.apiKey as string | undefined;
       if (apiKey) sessionStorage.setItem('merchantApiKey', apiKey);
     } catch (_) {
       // ignore storage errors (e.g., SSR)
@@ -313,7 +313,7 @@ export const getMerchantApiKey = async (
     if (!res.ok) throw new Error(`get credentials failed: ${res.status} ${res.statusText}`);
     const json = await res.json();
     try {
-      const apiKey = (json as any)?.data?.apiKey as string | undefined;
+      const apiKey = (json as InitCredentialsResponse)?.data?.apiKey as string | undefined;
       if (apiKey) sessionStorage.setItem('merchantApiKey', apiKey);
     } catch (_) {
       // ignore storage errors (e.g., SSR)
