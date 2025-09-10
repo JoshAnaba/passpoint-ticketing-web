@@ -49,7 +49,6 @@ const SideModal = ({ isOpen, onClose, title, subtitle, children }: SideModalProp
   );
 };
 
-
 // Bottom component that can be used as a child
 const Bottom: React.FC<BottomProps> = ({ children }) => {
   // This component doesn't render anything itself
