@@ -56,6 +56,7 @@ const Bottom: React.FC<BottomProps> = ({ children }) => {
   return null;
 };
 
+
 // Attach Bottom to SideModal for easier access
 SideModal.Bottom = Bottom;
 

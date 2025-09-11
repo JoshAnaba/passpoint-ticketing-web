@@ -22,6 +22,7 @@ interface PricingProviderProps {
   children: ReactNode;
 }
 
+
 export const PricingProvider: React.FC<PricingProviderProps> = ({ children }) => {
   const [selectedCurrency, setSelectedCurrency] = React.useState('USD');
   const [selectedCountry, setSelectedCountry] = React.useState('US');
