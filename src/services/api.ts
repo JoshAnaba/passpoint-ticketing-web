@@ -39,7 +39,7 @@ async function apiRequest<T>(endpoint: string): Promise<T> {
     if (!response.ok) {
       throw new Error(`API request failed: ${response.status} ${response.statusText}`);
     }
-    
+  
     return await response.json();
   } catch (error) {
     console.error('API request error:', error);
