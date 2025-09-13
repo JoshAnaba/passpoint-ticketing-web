@@ -25,8 +25,8 @@ interface PricingProviderProps {
 
 export const PricingProvider: React.FC<PricingProviderProps> = ({ children }) => {
   const [selectedCurrency, setSelectedCurrency] = React.useState('USD');
-  const [selectedCountry, setSelectedCountry] = React.useState('US');
-  // const [selectedCountry, setSelectedCountry] = React.useState('NG');
+  // const [selectedCountry, setSelectedCountry] = React.useState('US');
+  const [selectedCountry, setSelectedCountry] = React.useState('NG');
 
   // Use the custom hook for pricing data with React Query
   const {

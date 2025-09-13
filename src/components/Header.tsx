@@ -68,7 +68,7 @@ const Header = ({ onOpenCart }: HeaderProps) => {
 
             <div className="flex items-center gap-2 text-muted-foreground">
               <HelpCircle className="w-4 h-4" />
-              <span className="text-sm">Need help? support@passpoint.com</span>
+              <span className="text-sm">Need help? <a href="mailto:support@passpoint.com">support@passpoint.com</a></span>
             </div>
           </div>
         </div>

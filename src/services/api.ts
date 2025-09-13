@@ -20,6 +20,7 @@ export interface PriceResponse {
   responseDescription: string;
   responseMessage: string;
   otherInfo: string;
+  merchantId?: string;
   data: Record<string, PriceData>;
 }
 
@@ -117,10 +118,18 @@ export const getAvailableCurrencies = async (): Promise<CurrencyOption[]> => {
 export const getPricesForCountry = async (countryCode: string): Promise<PriceData | null> => {
   try {
     const response = await apiRequest<PriceResponse>(API_CONFIG.ENDPOINTS.PRICES(countryCode));
-    
-    if (response.responseCode === '00' && response.data[countryCode]) {
-      sessionStorage.setItem('merchantId', response.otherInfo);
-      getMerchantApiKey(response.otherInfo);
+    const {data} = response;
+    if (response.responseCode === '00' && data[countryCode]) {
+      // const merchantId = response.merchantId;
+      const {merchantId, clientId} = response.data as any;
+      // console.log('merchantId', merchantId)
+      // console.log('clientId', clientId)
+      if (merchantId) sessionStorage.setItem('merchantId', merchantId);
+      if (clientId) sessionStorage.setItem('clientId', clientId);
+      // if (merchantId) {
+        // sessionStorage.setItem('merchantId', merchantId);
+        // getMerchantApiKey(merchantId);
+      // }
       // initMerchantCredentials(response.otherInfo);
       return response.data[countryCode];
     }
@@ -134,6 +143,10 @@ export const getPricesForCountry = async (countryCode: string): Promise<PriceDat
 
 export const getMerchantId = (): string | null => {
   return sessionStorage.getItem('merchantId') || null;
+  // return 'fbf215c2-d6cd-4d88-be4e-e9b6d55dc78d'
+}
+export const getClientId = (): string | null => {
+  return sessionStorage.getItem('clientId') || null;
   // return 'fbf215c2-d6cd-4d88-be4e-e9b6d55dc78d'
 }
 
@@ -227,7 +240,7 @@ export const initiatePayment = async (
   };
   if (auth?.accessToken) headers['Authorization'] = `Bearer ${auth.accessToken}`;
   if (auth?.merchantId) headers['x-merchant-id'] = auth.merchantId;
-  if (!headers['x-merchant-id']) headers['x-merchant-id'] = 'fbf215c2-d6cd-4d88-be4e-e9b6d55dc78d';
+  if (!headers['x-merchant-id']) headers['x-merchant-id'] = getMerchantId();
 
   try {
     const res = await fetch(url, {
@@ -351,7 +364,8 @@ export const generateToken = async (
 ): Promise<GenerateTokenResponse> => {
   const url = `${API_CONFIG.BASE_URL}${GENERATE_TOKEN_URL}`;
   const headers: Record<string, string> = {
-    apptype: 'appservices',
+    // apptype: 'appservices',
+    apptype: 'checkout',
     "Content-Type": "application/json",
   };
   const body: GenerateTokenRequest = { merchantId, apiKey };
