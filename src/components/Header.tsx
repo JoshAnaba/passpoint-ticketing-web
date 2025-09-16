@@ -77,6 +77,6 @@ const Header = ({ onOpenCart }: HeaderProps) => {
       {/* <div className="h-2 bg-gradient-primary"></div> */}
     </header>
   );
-};
+}
 
 export default Header;
