@@ -6,7 +6,9 @@ const PoweredBy = ({ className = "" }) => (
   <div className={clsx("mt-8 flex justify-center", className)}>
     <div className="bg-black text-white px-4 py-2 rounded-lg flex items-center gap-2">
       <span className="text-sm">Powered by</span>
+      <a href="https://mypasspoint.com/" target="_blank" rel="noopener noreferrer">
       <PasspointLogo fill="#fff" />
+        </a>
       {/* <span className="font-bold text-lg">Passpoint</span> */}
     </div>
   </div>
@@ -22,7 +24,7 @@ const Footer = () => {
         backgroundRepeat: 'no-repeat'
       }}
     >
-      <PoweredBy className="absolute top-0 left-4 hidden lg:block" />
+      {/* <PoweredBy className="absolute top-0 left-4 hidden lg:block" /> */}
       {/* Overlay for better text readability */}
       {/* <div className="absolute inset-0 bg-black/40"></div> */}
 
@@ -154,7 +156,8 @@ const Footer = () => {
           </div>
 
           {/* Powered by section */}
-          <PoweredBy className='lg:hidden absolute bottom-[-20px] left-0' />
+          {/* - <PoweredBy className='block lg:fixed lg:bottom-3 lg:left-3' /> */}
+          <PoweredBy className='absolute bottom-3 left-3 lg:fixed lg:bottom-3 lg:left-3' />
         </div>
       </div>
     </footer>

@@ -11,7 +11,7 @@ import { formatCurrency } from "@/lib/currency";
 import { useCart, useCurrency, usePricing } from "@/context";
 import PrimaryButton from "./PrimaryButton";
 import type { TicketType } from "@/context";
-import { initiatePayment, getMerchantId, getMerchantApiKey, generateToken, InitCredentialsResponse, GenerateTokenResponse } from "@/services/api";
+import { initiatePayment, getMerchantId, getMerchantApiKey, generateToken, InitCredentialsResponse, GenerateTokenResponse, getClientId } from "@/services/api";
 
 interface ContactInfo {
   fullName: string;
@@ -110,24 +110,28 @@ const CheckoutModal = ({ isOpen, onClose }: CheckoutModalProps) => {
     try {
       setSubmitting(true);
       // 1) Read merchantId (should have been stored during pricing fetch)
-      const merchantId = await getMerchantId();
+      const merchantId = getMerchantId();
       if (!merchantId) {
         throw new Error("Unable to resolve merchant ID for selected country");
       }
 
       // 2) Obtain merchant apiKey (cached or fetch)
-      let apiKey = sessionStorage.getItem('merchantApiKey') || undefined;
-      if (!apiKey) {
-        const credsKey = await getMerchantApiKey(merchantId);
-        apiKey = (credsKey as InitCredentialsResponse)?.data?.apiKey as string | undefined;
-        if (apiKey) sessionStorage.setItem('merchantApiKey', apiKey);
-      }
-      if (!apiKey) {
-        throw new Error("Failed to obtain merchant API key");
-      }
+      // let apiKey = sessionStorage.getItem('merchantApiKey') || undefined;
+      // if (!apiKey) {
+      //   const credsKey = await getMerchantApiKey(merchantId);
+      //   apiKey = (credsKey as InitCredentialsResponse)?.data?.apiKey as string | undefined;
+      //   if (apiKey) sessionStorage.setItem('merchantApiKey', apiKey);
+      // }
+      // if (!apiKey) {
+      //   throw new Error("Failed to obtain merchant API key");
+      // }
+
+      const apiKey = import.meta.env.VITE_CHECKOUT_OATH2_CLIENT_SECRET as string | undefined;
+      const clientId = getClientId()
+      // console.log('clientId', clientId)
 
       // 3) Exchange apiKey for Bearer access token
-      const tokenResp = await generateToken(merchantId, apiKey);
+      const tokenResp = await generateToken(clientId, apiKey);
       const accessToken = (tokenResp as GenerateTokenResponse)?.data?.accessToken as string | undefined;
       const tokenType = ((tokenResp as GenerateTokenResponse)?.data?.tokenType || 'Bearer') as string;
       if (!accessToken) {
