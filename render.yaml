@@ -1,6 +1,7 @@
+
 services:
   - type: web
-    name: passpoint-ticketing
+    name: passpoint-website
     env: static
     buildCommand: npm run build
     staticPublishPath: ./dist
