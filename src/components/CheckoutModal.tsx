@@ -128,7 +128,7 @@ const CheckoutModal = ({ isOpen, onClose }: CheckoutModalProps) => {
 
       const apiKey = import.meta.env.VITE_CHECKOUT_OATH2_CLIENT_SECRET as string | undefined;
       const clientId = getClientId()
-      console.log('clientId', clientId)
+      // console.log('clientId', clientId)
 
       // 3) Exchange apiKey for Bearer access token
       const tokenResp = await generateToken(clientId, apiKey);
